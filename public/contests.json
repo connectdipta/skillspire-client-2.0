@@ -1,0 +1,66 @@
+[
+  {
+    "name": "Frontend Coding Challenge",
+    "type": "Coding",
+    "image": "https://i.pinimg.com/736x/96/d1/cc/96d1cc416bfc7a2a0a16feb235f1defa.jpg",
+    "description": "This frontend coding contest focuses on solving real-world UI problems using modern web technologies. Participants will build responsive, accessible, and visually appealing user interfaces using React and Tailwind CSS. The challenge evaluates component structure, state management, responsiveness, and clean coding practices. This contest is ideal for developers who want to strengthen their frontend skills and showcase professional-quality work in a competitive environment.",
+    "taskInstruction": "Participants must design and develop a complete frontend interface based on a given problem statement. The solution must include reusable React components, responsive layouts, and proper form handling. A live deployment link and GitHub repository link are required for submission. Code readability, performance optimization, and UI consistency will be evaluated during judging.",
+    "price": 200,
+    "prize": 5000,
+    "deadline": "2026-02-15T23:59:59Z",
+    "participants": 520,
+    "status": "confirmed"
+  },
+
+  {
+    "name": "UI/UX Design Contest",
+    "type": "Design",
+    "image": "https://i.pinimg.com/1200x/49/73/29/497329b04a35071ca767c394759bce26.jpg",
+    "description": "This UI/UX design contest challenges participants to create modern, intuitive, and user-friendly interfaces for a startup product. Designers must focus on usability, accessibility, visual hierarchy, and consistency. The contest emphasizes creative thinking and problem-solving through design. It is perfect for aspiring designers who want to demonstrate their design thinking and professional UI skills.",
+    "taskInstruction": "Participants are required to design high-fidelity UI screens using tools such as Figma or Adobe XD. Submissions must include wireframes, final designs, and a brief explanation of design decisions. A shareable design link is mandatory. Judges will evaluate creativity, usability, layout clarity, and overall user experience.",
+    "price": 150,
+    "prize": 4000,
+    "deadline": "2026-02-20T23:59:59Z",
+    "participants": 430,
+    "status": "confirmed"
+  },
+
+  {
+    "name": "JavaScript Quiz Battle",
+    "type": "Quiz",
+    "image": "https://i.pinimg.com/736x/6e/cd/05/6ecd05e38861082a329199dc42d6d602.jpg",
+    "description": "The JavaScript Quiz Battle is a fast-paced contest designed to test your understanding of core JavaScript concepts. Participants will face timed multiple-choice questions covering fundamentals, ES6 features, asynchronous programming, and logical reasoning. This contest is suitable for beginners and experienced developers who want to challenge their JavaScript knowledge under pressure.",
+    "taskInstruction": "Participants must complete a timed online quiz consisting of multiple-choice and logic-based questions. Accuracy and completion time will determine the final score. No external resources are allowed during the contest. A stable internet connection is required to avoid disqualification.",
+    "price": 100,
+    "prize": 3000,
+    "deadline": "2026-01-30T23:59:59Z",
+    "participants": 610,
+    "status": "confirmed"
+  },
+
+  {
+    "name": "Photography Contest",
+    "type": "Photography",
+    "image": "https://i.pinimg.com/736x/cc/90/0d/cc900de0e8c78e18ce2352229388a2fa.jpg",
+    "description": "This photography contest invites creative individuals to capture meaningful moments through the lens. Participants can submit original photographs that reflect storytelling, emotion, and composition. The contest focuses on creativity, lighting, framing, and originality. It is an excellent opportunity for photographers to showcase their artistic vision.",
+    "taskInstruction": "Participants must submit original photographs along with a short description explaining the concept behind the image. Images should not contain watermarks or heavy editing. A Google Drive or cloud storage link must be provided. Judges will evaluate creativity, clarity, and visual storytelling.",
+    "price": 120,
+    "prize": 3500,
+    "deadline": "2026-02-10T23:59:59Z",
+    "participants": 290,
+    "status": "confirmed"
+  },
+
+  {
+    "name": "Competitive Programming Marathon",
+    "type": "Coding",
+    "image": "https://i.pinimg.com/736x/1f/87/b2/1f87b29a2df46100a75aa86b170a21cb.jpg",
+    "description": "The Competitive Programming Marathon is designed for problem solvers who enjoy algorithmic challenges. Participants will solve complex problems involving data structures, algorithms, and logical reasoning. This contest tests speed, accuracy, and problem-solving ability under strict time constraints.",
+    "taskInstruction": "Participants must solve algorithmic problems using C++, Java, or Python. Submissions will be evaluated based on correctness and execution time. Plagiarism or code sharing will result in immediate disqualification.",
+    "price": 250,
+    "prize": 7000,
+    "deadline": "2026-03-01T23:59:59Z",
+    "participants": 780,
+    "status": "confirmed"
+  }
+]
