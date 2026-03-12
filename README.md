@@ -7,8 +7,7 @@ Built with **React**, **Firebase Authentication**, and a modern UI/UX approach.
 ---
 
 ## 🔗 Live Website
-- **Local URL:** `http://localhost:5173`  
-*(Replace with deployed URL when hosted)*
+- **Local URL:** `https://skillspire-client-beta.vercel.app`  
 
 ---
 
