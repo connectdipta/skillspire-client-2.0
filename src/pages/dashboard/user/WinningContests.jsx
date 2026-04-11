@@ -5,6 +5,20 @@ import { motion } from "framer-motion";
 import { FiAward, FiDollarSign, FiCalendar, FiArrowRight, FiZap } from "react-icons/fi";
 import { Link } from "react-router";
 
+const normalizeId = (value) => {
+  if (!value) return null;
+  if (typeof value === "string") return value;
+  if (typeof value === "object") {
+    if (value.$oid) return value.$oid;
+    if (typeof value.toHexString === "function") return value.toHexString();
+    if (typeof value.toString === "function") {
+      const parsed = value.toString();
+      if (parsed && parsed !== "[object Object]") return parsed;
+    }
+  }
+  return null;
+};
+
 const WinningContests = () => {
   const [wins, setWins] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -14,7 +28,9 @@ const WinningContests = () => {
       try {
         // 1. Fetch the user profile to get the list of Won Contest IDs
         const meRes = await axiosSecure.get("/users/me");
-        const contestIds = meRes.data?.wonContests || [];
+        const contestIds = (meRes.data?.wonContests || [])
+          .map(normalizeId)
+          .filter(Boolean);
 
         if (contestIds.length === 0) {
           setWins([]);

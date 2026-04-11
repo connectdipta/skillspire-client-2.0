@@ -19,30 +19,53 @@ const EditContest = () => {
   const [submitting, setSubmitting] = useState(false);
   const [imagePreview, setImagePreview] = useState("");
 
+  const applyContestToForm = (contest) => {
+    reset({
+      name: contest.name,
+      description: contest.description,
+      taskInstruction: contest.taskInstruction,
+      type: contest.type,
+      price: contest.price,
+      prize: contest.prize,
+    });
+
+    setDeadline(new Date(contest.deadline));
+    setImagePreview(contest.image);
+  };
+
   /* ---------- LOAD CONTEST ---------- */
   useEffect(() => {
-    axiosPublic.get(`/contests/${id}`).then((res) => {
-      const contest = res.data;
+    let mounted = true;
 
-      if (contest.status !== "pending") {
-        Swal.fire("Access Denied", "Confirmed contests cannot be modified.", "warning");
+    const loadContest = async () => {
+      try {
+        const res = await axiosPublic.get(`/contests/${id}`);
+        const contest = res.data;
+
+        if (contest.status !== "pending") {
+          Swal.fire("Access Denied", "Confirmed contests cannot be modified.", "warning");
+          navigate("/dashboard/my-contests");
+          return;
+        }
+
+        if (mounted) {
+          applyContestToForm(contest);
+        }
+      } catch (err) {
+        Swal.fire("Error", "Could not load this contest from server.", "error");
         navigate("/dashboard/my-contests");
-        return;
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
       }
+    };
 
-      reset({
-        name: contest.name,
-        description: contest.description,
-        taskInstruction: contest.taskInstruction,
-        type: contest.type,
-        price: contest.price,
-        prize: contest.prize,
-      });
+    loadContest();
 
-      setDeadline(new Date(contest.deadline));
-      setImagePreview(contest.image);
-      setLoading(false);
-    });
+    return () => {
+      mounted = false;
+    };
   }, [id, reset, navigate]);
 
   /* ---------- SUBMIT ---------- */

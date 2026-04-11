@@ -57,15 +57,16 @@ const Register = () => {
         photo: photoURL,
       });
 
-    /* ================= 4️⃣ GET JWT TOKEN ================= */
-const jwtRes = await axiosPublic.post("/jwt", {
-  email: data.email,
-  name: data.name,
-  photo: photoURL,
-});
+      /* ================= 4️⃣ GET JWT TOKEN ================= */
+      const jwtRes = await axiosPublic.post("/jwt", {
+        email: data.email,
+        name: data.name,
+        photo: photoURL,
+      });
 
-/* ⭐ SAVE TOKEN (IMPORTANT) */
-localStorage.setItem("access-token", jwtRes.data.token);
+      if (jwtRes?.data?.token) {
+        localStorage.setItem("access-token", jwtRes.data.token);
+      }
 
       Swal.fire({
         icon: "success",
@@ -77,10 +78,11 @@ localStorage.setItem("access-token", jwtRes.data.token);
 
       navigate("/");
     } catch (error) {
+      const serverMessage = error?.response?.data?.message;
       Swal.fire({
         icon: "error",
         title: "Registration Failed",
-        text: error.message || "Something went wrong",
+        text: serverMessage || error.message || "Something went wrong",
       });
     }
   };

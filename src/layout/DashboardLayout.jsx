@@ -10,25 +10,43 @@ import {
   FiUser,
   FiAward,
   FiList,
+  FiSend,
+  FiFileText,
+  FiClipboard,
 } from "react-icons/fi";
 import Logo from "../components/Logo";
 import useAuth from "../hooks/useAuth";
 import axiosPublic from "../api/axiosPublic";
 import userProfile from "../assets/userProfile.png";
+import { getRoleFromAccessToken } from "../utils/sessionRole";
 
 const DashboardLayout = () => {
-  const { user, logout } = useAuth();
-  const [role, setRole] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { user, logout, loading: authLoading } = useAuth();
+  const [role, setRole] = useState(() => getRoleFromAccessToken() || "user");
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (!user?.email) return;
+  const fetchRole = () => {
+    if (!user?.email) {
+      setRole("user");
+      setLoading(false);
+      return;
+    }
 
     axiosPublic
       .get("/users/me")
       .then(res => setRole(res.data.role))
       .catch(() => setRole("user"))
-      .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    if (authLoading) return;
+    fetchRole();
+  }, [user?.email, authLoading]);
+
+  useEffect(() => {
+    const onRoleUpdated = () => fetchRole();
+    window.addEventListener("role-updated", onRoleUpdated);
+    return () => window.removeEventListener("role-updated", onRoleUpdated);
   }, [user?.email]);
 
   // Premium Navigation Classes
@@ -48,17 +66,17 @@ const DashboardLayout = () => {
   }
 
   return (
-    <div className="min-h-screen grid grid-cols-12 bg-[#020617] text-slate-200">
+    <div className="min-h-screen lg:grid lg:grid-cols-12 bg-[#020617] text-slate-200">
       
       {/* ================= SIDEBAR ================= */}
-      <aside className="col-span-12 md:col-span-3 lg:col-span-2 bg-[#0a0f1c] p-6 flex flex-col justify-between border-r border-slate-800/50 sticky top-0 h-screen">
+      <aside className="col-span-12 lg:col-span-2 bg-[#0a0f1c] p-4 md:p-6 flex flex-col gap-6 lg:gap-0 lg:justify-between border-b lg:border-b-0 lg:border-r border-slate-800/50 lg:sticky lg:top-0 lg:h-screen">
 
         <div className="space-y-8">
           <Link to="/" className="block px-2">
             <Logo />
           </Link>
 
-          <nav className="flex flex-col gap-2">
+          <nav className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2">
             {/* USER ROLE LINKS */}
             {role === "user" && (
               <>
@@ -70,6 +88,9 @@ const DashboardLayout = () => {
                 </NavLink>
                 <NavLink to="/dashboard/profile" className={({ isActive }) => isActive ? activeClass : normalClass}>
                   <FiUser size={20} /> <span className="text-sm">My Profile</span>
+                </NavLink>
+                <NavLink to="/dashboard/apply-creator" className={({ isActive }) => isActive ? activeClass : normalClass}>
+                  <FiSend size={20} /> <span className="text-sm">Apply Creator</span>
                 </NavLink>
               </>
             )}
@@ -97,6 +118,12 @@ const DashboardLayout = () => {
                 </NavLink>
                 <NavLink to="/dashboard/manage-contests" className={({ isActive }) => isActive ? activeClass : normalClass}>
                   <FiCheckSquare size={20} /> <span className="text-sm">Manage Contests</span>
+                </NavLink>
+                <NavLink to="/dashboard/contest-requests" className={({ isActive }) => isActive ? activeClass : normalClass}>
+                  <FiClipboard size={20} /> <span className="text-sm">Contest Requests</span>
+                </NavLink>
+                <NavLink to="/dashboard/creator-requests" className={({ isActive }) => isActive ? activeClass : normalClass}>
+                  <FiFileText size={20} /> <span className="text-sm">Creator Requests</span>
                 </NavLink>
               </>
             )}
@@ -129,8 +156,8 @@ const DashboardLayout = () => {
       </aside>
 
       {/* ================= MAIN CONTENT ================= */}
-      <main className="col-span-12 md:col-span-9 lg:col-span-10 p-6 lg:p-10 overflow-y-auto h-screen bg-[#020617]">
-        <div className="bg-[#0a0f1c]/50 border border-slate-800/50 rounded-[2.5rem] p-8 min-h-full backdrop-blur-sm shadow-2xl">
+      <main className="col-span-12 lg:col-span-10 p-4 md:p-6 lg:p-10 lg:overflow-y-auto lg:h-screen bg-[#020617]">
+        <div className="bg-[#0a0f1c]/50 border border-slate-800/50 rounded-2xl md:rounded-3xl lg:rounded-[2.5rem] p-4 md:p-6 lg:p-8 min-h-full backdrop-blur-sm shadow-2xl">
           <Outlet />
         </div>
       </main>

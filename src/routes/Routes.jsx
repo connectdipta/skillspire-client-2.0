@@ -11,6 +11,7 @@ import AboutUs from "../pages/AboutUs";
 import AllContests from "../pages/AllContests";
 import ContestDetails from "../pages/ContestDetails";
 import ErrorPage from "../pages/ErrorPage";
+import CreatorPage from "../pages/CreatorPage";
 
 /* -------- Auth Pages -------- */
 import Login from "../pages/Auth/Login";
@@ -26,10 +27,13 @@ import EditContest from "../pages/dashboard/creator/EditContest";
 import ParticipatedContests from "../pages/dashboard/user/ParticipatedContests";
 import WinningContests from "../pages/dashboard/user/WinningContests";
 import MyProfile from "../pages/dashboard/user/MyProfile";
+import ApplyCreator from "../pages/dashboard/user/ApplyCreator";
 
 /* -------- Admin Dashboard -------- */
 import ManageUsers from "../pages/dashboard/admin/ManageUsers";
 import ManageContests from "../pages/dashboard/admin/ManageContests";
+import ContestRequests from "../pages/dashboard/admin/ContestRequests";
+import ManageCreatorRequests from "../pages/dashboard/admin/ManageCreatorRequests";
 
 /* -------- Route Guards -------- */
 import PrivateRoute from "./PrivateRoute";
@@ -53,6 +57,7 @@ export const router = createBrowserRouter([
       { path: "blog", element: <Blog /> },
       { path: "terms", element: <TermsAndConditions /> },
       { path: "leaderboard", element: <Leaderboard /> },
+      { path: "creator", element: <CreatorPage /> },
       {
         path: "all-contests",
         element: (
@@ -148,6 +153,10 @@ export const router = createBrowserRouter([
         path: "profile",
         element: <MyProfile />,
       },
+      {
+        path: "apply-creator",
+        element: <ApplyCreator />,
+      },
 
       /* -------- ADMIN -------- */
       {
@@ -163,6 +172,22 @@ export const router = createBrowserRouter([
         element: (
           <AdminRoute>
             <ManageContests />
+          </AdminRoute>
+        ),
+      },
+      {
+        path: "contest-requests",
+        element: (
+          <AdminRoute>
+            <ContestRequests />
+          </AdminRoute>
+        ),
+      },
+      {
+        path: "creator-requests",
+        element: (
+          <AdminRoute>
+            <ManageCreatorRequests />
           </AdminRoute>
         ),
       },

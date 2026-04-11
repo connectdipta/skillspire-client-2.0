@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import axiosPublic from "../../../api/axiosSecure";
 import useAuth from "../../../hooks/useAuth";
 import Swal from "sweetalert2";
 import { useNavigate, Link } from "react-router";
@@ -12,34 +11,42 @@ const MyContests = () => {
   const [contests, setContests] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const fetchContests = async () => {
     if (!user?.email) return;
 
-    const fetchContests = async () => {
-      setLoading(true);
-      try {
-        // We fetch contests filtered by the creator's email
-        const res = await axiosPublic.get("/contests", { 
-          params: { creatorEmail: user.email } 
-        });
-        
-        // Sorting by ID (newest first)
-        const sorted = [...res.data].sort((a, b) => b._id.localeCompare(a._id));
-        setContests(sorted);
-      } catch (error) {
-        Swal.fire({ 
-          icon: "error", 
-          title: "Fetch Failed", 
-          text: "Could not load your contests.",
-          background: "#0a0f1c", 
-          color: "#fff" 
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
+    setLoading(true);
+    try {
+      const res = await axiosSecure.get("/contests", {
+        params: { creatorEmail: user.email } 
+      });
 
+      const remote = Array.isArray(res.data) ? res.data : [];
+      const sorted = [...remote].sort((a, b) => String(b._id).localeCompare(String(a._id)));
+      setContests(sorted);
+    } catch (error) {
+      setContests([]);
+      Swal.fire({ 
+        icon: "error", 
+        title: "Fetch Failed", 
+        text: "Could not load contests from server.",
+        background: "#0a0f1c", 
+        color: "#fff" 
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchContests();
+  }, [user?.email]);
+
+  useEffect(() => {
+    window.addEventListener("focus", fetchContests);
+
+    return () => {
+      window.removeEventListener("focus", fetchContests);
+    };
   }, [user?.email]);
 
   const handleDelete = async (id) => {
@@ -61,7 +68,11 @@ const MyContests = () => {
         setContests((prev) => prev.filter((c) => c._id !== id));
         Swal.fire({ title: "Deleted!", icon: "success", background: "#0a0f1c", color: "#fff", timer: 1000, showConfirmButton: false });
       } catch (err) {
-        Swal.fire("Error", "Check if this contest has active participants before deleting.", "error");
+        Swal.fire(
+          "Error",
+          err?.response?.data?.message || "Check if this contest has active participants before deleting.",
+          "error"
+        );
       }
     }
   };
@@ -79,7 +90,7 @@ const MyContests = () => {
     <div className="space-y-8">
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-black text-white">My <span className="text-primary">Arenas</span></h2>
+          <h2 className="text-2xl md:text-3xl font-black text-white">My <span className="text-primary">Arenas</span></h2>
           <p className="text-slate-500 text-sm mt-1 font-bold">Real-time engagement tracking</p>
         </div>
         <Link to="/dashboard/add-contest" className="bg-white text-black px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-primary hover:text-white transition-all text-center">
@@ -89,7 +100,7 @@ const MyContests = () => {
 
       <div className="overflow-hidden bg-[#0a0f1c]/50 border border-slate-800 rounded-[2.5rem]">
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+          <table className="w-full min-w-[840px] text-left border-collapse">
             <thead className="bg-slate-900/80">
               <tr>
                 <th className="p-6 text-[10px] uppercase text-slate-500 font-black">Contest Info</th>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axiosPublic from "../../../api/axiosPublic";
+import axiosSecure from "../../../api/axiosSecure";
 import Swal from "sweetalert2";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
@@ -24,24 +24,41 @@ const ManageContests = () => {
     fetchContests();
   }, []);
 
+  useEffect(() => {
+    window.addEventListener("focus", fetchContests);
+
+    return () => {
+      window.removeEventListener("focus", fetchContests);
+    };
+  }, []);
+
   const fetchContests = () => {
     setLoading(true);
-    axiosPublic
+    axiosSecure
       .get("/admin/contests")
       .then((res) => {
+        const remoteList = Array.isArray(res.data)
+          ? res.data
+          : Array.isArray(res.data?.value)
+          ? res.data.value
+          : [];
+
         // Sort by ID descending (MongoDB IDs contain timestamps)
-        const sortedData = [...res.data].sort((a, b) => b._id.localeCompare(a._id));
+        const sortedData = [...remoteList].sort((a, b) =>
+          String(b?._id || "").localeCompare(String(a?._id || ""))
+        );
         setContests(sortedData);
       })
-      .catch(() => 
+      .catch((error) => {
+        setContests([]);
         Swal.fire({ 
           icon: "error", 
           title: "Error", 
-          text: "Failed to fetch registry", 
+          text: error?.response?.data?.message || "Failed to fetch registry", 
           background: "#0a0f1c", 
           color: "#fff" 
-        })
-      )
+        });
+      })
       .finally(() => setLoading(false));
   };
 
@@ -68,7 +85,8 @@ const ManageContests = () => {
     if (!confirm.isConfirmed) return;
 
     try {
-      await axiosPublic.patch(`/admin/contests/${id}/status`, { status });
+      await axiosSecure.patch(`/admin/contests/${id}/status`, { status });
+
       setContests((prev) =>
         prev.map((c) => (c._id === id ? { ...c, status } : c))
       );
@@ -102,7 +120,8 @@ const ManageContests = () => {
     if (!confirm.isConfirmed) return;
 
     try {
-      await axiosPublic.delete(`/admin/contests/${id}`);
+      await axiosSecure.delete(`/admin/contests/${id}`);
+
       setContests((prev) => prev.filter((c) => c._id !== id));
       setSelectedContest(null);
       Swal.fire({ 
@@ -154,13 +173,13 @@ const ManageContests = () => {
                 </button>
               </div>
               
-              <div className="p-8 space-y-6">
+              <div className="p-5 md:p-8 space-y-6">
                 <div>
-                  <h3 className="text-2xl font-black text-white">{selectedContest.name}</h3>
+                  <h3 className="text-xl md:text-2xl font-black text-white">{selectedContest.name}</h3>
                   <p className="text-slate-400 mt-2 text-sm leading-relaxed">{selectedContest.description}</p>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="bg-slate-800/50 p-4 rounded-2xl border border-slate-700">
                     <p className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1">Prize Pool</p>
                     <p className="text-primary font-bold flex items-center gap-1"><FiDollarSign/> {selectedContest.prize}</p>
@@ -171,7 +190,7 @@ const ManageContests = () => {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3 pt-4 border-t border-slate-800">
                     {selectedContest.status === 'pending' && (
                         <button 
                           onClick={() => updateStatus(selectedContest._id, 'confirmed')} 
@@ -195,7 +214,7 @@ const ManageContests = () => {
 
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-black text-white">Manage <span className="text-primary">Contests</span></h2>
+          <h2 className="text-2xl md:text-3xl font-black text-white">Manage <span className="text-primary">Contests</span></h2>
           <p className="text-slate-500 text-sm mt-1 font-bold">
             {searchQuery ? `${filteredContests.length} Matches Found` : `${contests.length} Contests Total`}
           </p>
@@ -214,7 +233,8 @@ const ManageContests = () => {
       </header>
 
       <div className="overflow-hidden bg-[#0a0f1c]/50 border border-slate-800 rounded-[2.5rem]">
-        <table className="w-full text-left">
+        <div className="overflow-x-auto">
+        <table className="w-full min-w-[760px] text-left">
           <thead className="bg-slate-900/80">
             <tr>
               <th className="p-6 text-[10px] uppercase text-slate-500 font-black">Contest Details</th>
@@ -277,6 +297,7 @@ const ManageContests = () => {
             ))}
           </tbody>
         </table>
+        </div>
         
         {filteredContests.length === 0 && (
           <div className="py-24 text-center">

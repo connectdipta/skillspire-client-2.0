@@ -8,6 +8,20 @@ import { AnimatePresence, motion } from "framer-motion";
 import AOS from "aos";
 import "aos/dist/aos.css";
 
+const normalizeId = (value) => {
+  if (!value) return null;
+  if (typeof value === "string") return value;
+  if (typeof value === "object") {
+    if (value.$oid) return value.$oid;
+    if (typeof value.toHexString === "function") return value.toHexString();
+    if (typeof value.toString === "function") {
+      const parsed = value.toString();
+      if (parsed && parsed !== "[object Object]") return parsed;
+    }
+  }
+  return null;
+};
+
 const ContestDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -44,7 +58,8 @@ const ContestDetails = () => {
   useEffect(() => {
     if (!user?.email) return;
     axiosSecure.get("/users/me").then(res => {
-      setIsRegistered(res.data.participatedContests?.includes(id));
+      const participated = res.data?.participatedContests || [];
+      setIsRegistered(participated.some((contestId) => normalizeId(contestId) === id));
     });
     axiosSecure.get("/submissions", { params: { contestId: id } }).then(res => {
       const submitted = res.data.some(s => s.userEmail === user.email);
@@ -89,8 +104,12 @@ const ContestDetails = () => {
       setHasSubmitted(true);
       setShowModal(false);
       setSubmissionText("");
-    } catch {
-      Swal.fire("Error", "Submission failed", "error");
+    } catch (error) {
+      Swal.fire(
+        "Error",
+        error?.response?.data?.message || "Submission failed",
+        "error"
+      );
     }
   };
 

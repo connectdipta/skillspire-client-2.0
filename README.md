@@ -1,217 +1,119 @@
-# 🌐 SkillSpire Frontend
+# SkillSpire Client
 
-Frontend application for **SkillSpire**, a modern contest creation and participation platform where users can compete, win prizes, and climb the leaderboard.
+![Build](https://img.shields.io/badge/Build-Vite-646CFF?logo=vite&logoColor=white)
+![Deploy](https://img.shields.io/website?url=https%3A%2F%2Fskillspire-client-2-0.vercel.app&label=Deploy&logo=vercel)
+![License](https://img.shields.io/badge/License-Not%20specified-lightgrey)
 
-Built with **React**, **Firebase Authentication**, and a modern UI/UX approach.
+Production frontend for the SkillSpire contest platform.
 
----
+This project is built with React and Vite, uses Firebase Authentication, and connects to the SkillSpire API for role-based contest workflows.
 
-## 🔗 Live Website
-- **Local URL:** `https://skillspire-client-beta.vercel.app`  
+## Live URL
 
----
+- Production: https://skillspire-client-2-0.vercel.app
 
-## 🛠️ Technologies Used
-- **React (Vite)**
-- **React Router**
-- **Firebase Authentication**
-- **Axios**
-- **Tailwind CSS + DaisyUI**
-- **Framer Motion**
-- **SweetAlert2**
-- **AOS (Animate On Scroll)**
+## Tech Stack
 
----
+- React 18 + Vite
+- React Router
+- Tailwind CSS + DaisyUI
+- Axios
+- Firebase Authentication
+- Framer Motion + AOS
+- SweetAlert2
 
-## 🎨 UI Highlights
-- Modern **dark-themed UI**
-- Fully **responsive design** (mobile, tablet, desktop)
-- Smooth **animations** (Framer Motion + AOS)
-- **Role-based dashboards**
-- Real-time **leaderboard**
-- Contest **status badges** (Active / Ended)
+## Core Features
 
----
+- Public contest discovery and details
+- Role-based dashboard (User, Creator, Admin)
+- JWT-backed authenticated API access
+- Contest creation, moderation, and submission flows
+- Leaderboard and winners pages
+- Responsive UI for mobile, tablet, and desktop
 
-## 🔐 Authentication System
-- Email & Password Login
-- Google Login (Firebase)
-- JWT-based session (via backend cookies)
-- Auto-login on refresh
-- Secure logout
+## Project Structure
 
-### 🔄 Authentication Flow
-1. User logs in via **Firebase**
-2. Frontend sends user data to backend `/jwt`
-3. Backend sets JWT in **HTTP-only cookie**
-4. Protected routes automatically validate JWT
-
----
-
-## 👥 User Roles & Dashboards
-
-### 👤 Normal User
-- Browse contests
-- Join contests (payment)
-- Submit entries
-- View participated contests
-- View winning contests
-- Appear on leaderboard
-
-### 🧑‍🎨 Contest Creator
-- Create contests
-- Edit/Delete pending contests
-- View submissions
-- Declare winners
-
-### 🛡️ Admin
-- Approve / reject contests
-- Delete contests
-- Manage users
-- Full system access
-
----
-
-## 📂 Project Structure
+```text
 src/
-├── api/
-│ ├── axiosPublic.js
-│ └── axiosSecure.js
-│
-├── components/
-│ ├── ContestCard.jsx
-│ ├── GoogleLogin.jsx
-│ └── Navbar.jsx
-│
-├── hooks/
-│ ├── useAuth.js
-│ ├── useAdmin.js
-│ └── useCreator.js
-│
-├── layout/
-│ ├── DashboardLayout.jsx
-│ └── MainLayout.jsx
-│
-├── pages/
-│ ├── Home.jsx
-│ ├── Login.jsx
-│ ├── Register.jsx
-│ ├── Leaderboard.jsx
-│ ├── ContestDetails.jsx
-│ └── Dashboard/
-│ ├── MyParticipated.jsx
-│ ├── MyWinnings.jsx
-│ ├── ManageContests.jsx
-│ └── ManageUsers.jsx
-│
-├── provider/
-│ └── AuthProvider.jsx
-│
-├── routes/
-│ └── Routes.jsx
-│
-└── main.jsx
+	api/
+	assets/
+	components/
+	context/
+	firebase/
+	hooks/
+	layout/
+	pages/
+	routes/
+```
 
+## Architecture Diagram
 
----
+```mermaid
+flowchart LR
+	U[User Browser] --> C[SkillSpire Client\nReact + Vite]
+	C --> F[Firebase Auth]
+	C --> A[SkillSpire Server API]
+	A --> D[(MongoDB Atlas)]
+	A --> J[JWT Session]
+	J --> C
+```
 
-## 🔒 Route Protection
+## Environment Variables
 
-| Route Type | Protection |
-|-----------|-----------|
-| Private Routes | Logged-in users only |
-| Admin Routes | Admin role required |
-| Creator Routes | Creator role required |
-
-### Implemented Using
-- `AuthProvider`
-- Custom hooks (`useAdmin`, `useCreator`)
-- Backend JWT validation
-
----
-
-## 🏆 Core Features
-
-### 🎯 Contest System
-- Contest cards with **Active / Ended** status
-- Participant count
-- Prize pool display
-- Search & filter contests
-
-### 📝 Submission System
-- Secure submission per contest
-- Creator-only submission view
-- Winner declaration
-
-### 🥇 Leaderboard
-- Ranked by total wins
-- Profile photo & name
-- Animated podium UI
-
-### 🏅 My Winning Contests
-- List of all winning contests
-- Prize earned
-- Winning date
-- Direct access to winning entry
-
-### 💳 Payment Integration (Simulation)
-- Contest registration via payment API
-- Prevents duplicate registration
-- Auto participant count update
-
----
-
-## ⚙️ Environment Variables
-
-Create a `.env` file in the frontend root:
+Create `.env` in the client root:
 
 ```env
 VITE_apiKey=your_firebase_api_key
 VITE_authDomain=your_firebase_auth_domain
 VITE_projectId=your_firebase_project_id
 VITE_storageBucket=your_firebase_storage_bucket
-VITE_messagingSenderId=your_sender_id
-VITE_appId=your_app_id
-VITE_API_URL=http://localhost:3000
-🚀 Getting Started
-Install Dependencies
+VITE_messagingSenderId=your_firebase_sender_id
+VITE_appId=your_firebase_app_id
+VITE_imgHost=your_imgbb_api_key
+VITE_API_BASE_URL=https://skillspire-server-2-0.vercel.app
+```
+
+## Local Development
+
+Install dependencies:
+
+```bash
 npm install
-Run Development Server
+```
+
+Start dev server:
+
+```bash
 npm run dev
-🔗 Backend Dependency
-This frontend depends on the SkillSpire Backend API for:
+```
 
-Authentication (JWT)
+Build for production:
 
-Contest management
+```bash
+npm run build
+```
 
-Payments
+Preview production build locally:
 
-Submissions
+```bash
+npm run preview
+```
 
-Leaderboard
+## Deployment (Vercel)
 
-👉 Make sure the backend server is running before login.
+- Framework preset: Vite (auto-detected)
+- Build command: `npm run build`
+- Output directory: `dist`
+- Required Vercel environment variables: all `VITE_*` keys listed above
 
-✅ Assignment Requirement Coverage
-✔ Google & Email Authentication
-✔ Role-based dashboards
-✔ Contest creation & approval
-✔ Secure submission & winner system
-✔ Leaderboard
-✔ Modern UI with animations
-✔ Protected routes
-✔ Backend integration via JWT
+After deployment, ensure Firebase Authentication Authorized Domains includes:
 
-👨‍💻 Author
-DIPTA ACHARJEE
-BSc in CSE
+- `skillspire-client-2-0.vercel.app`
 
-SkillSpire – Contest Creation Platform 🚀
+## API Dependency
 
+This client is configured to use:
 
-If you want next, I can:
-- 🔥 Align **frontend + backend README styling**
-- 📸 Add **screenshots section**
-- 🌍 Add **deployment guide (Netlify/Vercel)**
-- 🎓 Simplify for **university assignment submission**
+- https://skillspire-server-2-0.vercel.app
+
+If you change backend URL, update `VITE_API_BASE_URL` and redeploy.

@@ -46,6 +46,11 @@ const links = (
       </NavLink>
     </li>
     <li>
+      <NavLink to="/creator" onClick={() => setOpen(false)} className={({ isActive }) => (isActive ? activeClass : inactiveClass)}>
+        Creator
+      </NavLink>
+    </li>
+    <li>
       <NavLink to="/leaderboard" onClick={() => setOpen(false)} className={({ isActive }) => (isActive ? activeClass : inactiveClass)}>
         Leaderboard
       </NavLink>

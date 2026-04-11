@@ -40,16 +40,17 @@ const Login = () => {
         photo: result.user.photoURL || "",
       });
 
-     const jwtRes = await axiosPublic.post("/jwt", {
-  email: result.user.email,
-  name: result.user.displayName,
-  photo: result.user.photoURL,
-});
+          const jwtRes = await axiosPublic.post("/jwt", {
+            email: result.user.email,
+            name: result.user.displayName,
+            photo: result.user.photoURL,
+          });
 
-/* ⭐ SAVE TOKEN (MOST IMPORTANT LINE) */
-localStorage.setItem("access-token", jwtRes.data.token);
+          if (jwtRes?.data?.token) {
+            localStorage.setItem("access-token", jwtRes.data.token);
+          }
 
-const role = jwtRes.data.role || "user";
+          const role = jwtRes?.data?.role || "user";
 
       Swal.fire({
         icon: "success",
@@ -65,9 +66,10 @@ const role = jwtRes.data.role || "user";
         navigate(location.state || "/", { replace: true });
       }
     } catch (error) {
+      const serverMessage = error?.response?.data?.message;
       Swal.fire(
         "Access Denied",
-        error?.message || "Invalid credentials. Please try again.",
+        serverMessage || error?.message || "Invalid credentials. Please try again.",
         "error"
       );
     }

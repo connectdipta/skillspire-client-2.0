@@ -30,7 +30,9 @@ const GoogleLogin = ({ label = "Continue with Google" }) => {
       });
 
       /* ================= SAVE TOKEN ================= */
-      localStorage.setItem("access-token", res.data.token);
+      if (res?.data?.token) {
+        localStorage.setItem("access-token", res.data.token);
+      }
 
       Swal.fire({
         icon: "success",
@@ -43,11 +45,19 @@ const GoogleLogin = ({ label = "Continue with Google" }) => {
 
     } catch (err) {
       console.log(err);
+      const serverMessage = err?.response?.data?.message;
+      const firebaseCode = err?.code;
+      const currentHost = window.location.hostname;
+
+      const message =
+        firebaseCode === "auth/unauthorized-domain"
+          ? `Firebase blocked this domain (${currentHost}). Add it in Firebase Console -> Authentication -> Settings -> Authorized domains, then retry.`
+          : serverMessage || err?.message || "Google login failed";
 
       Swal.fire({
         icon: "error",
         title: "Authentication Failed",
-        text: err?.message || "Google login failed",
+        text: message,
       });
     }
   };

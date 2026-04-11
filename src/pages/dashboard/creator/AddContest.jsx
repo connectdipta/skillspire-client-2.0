@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -7,11 +7,97 @@ import Swal from "sweetalert2";
 import useAuth from "../../../hooks/useAuth";
 import axios from "axios";
 
+const demoContest = {
+  name: "Neon Interface Sprint",
+  description:
+    "Design and build a bold next-generation UI concept for a startup dashboard with strong hierarchy, motion, and clear accessibility.",
+  taskInstruction:
+    "Submit a live preview link, source code repository, and a short explanation of your design decisions. Include responsive behavior and dark theme support.",
+  type: "Design",
+  price: 15,
+  prize: 750,
+  deadline: new Date(Date.now() + 1000 * 60 * 60 * 24 * 10),
+  imageUrl:
+    "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=80",
+};
+
 const AddContest = () => {
   const { user } = useAuth();
-  const { register, handleSubmit, reset } = useForm();
+  const { register, handleSubmit, reset, setValue } = useForm();
   const [deadline, setDeadline] = useState(new Date());
   const [loading, setLoading] = useState(false);
+  const imageInputRef = useRef(null);
+
+  const fileToDataUrl = (file) =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result || ""));
+      reader.onerror = () => reject(new Error("Could not read image file"));
+      reader.readAsDataURL(file);
+    });
+
+  const resolveContestImage = async (file) => {
+    try {
+      const formData = new FormData();
+      formData.append("image", file);
+
+      const imgRes = await axios.post(
+        `https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_imgHost}`,
+        formData
+      );
+
+      return imgRes.data?.data?.url || (await fileToDataUrl(file));
+    } catch {
+      return fileToDataUrl(file);
+    }
+  };
+
+  const applyDemoData = async () => {
+    try {
+      setValue("name", demoContest.name);
+      setValue("description", demoContest.description);
+      setValue("taskInstruction", demoContest.taskInstruction);
+      setValue("type", demoContest.type);
+      setValue("price", demoContest.price);
+      setValue("prize", demoContest.prize);
+      setDeadline(demoContest.deadline);
+
+      if (imageInputRef.current && demoContest.imageUrl) {
+        const response = await fetch(demoContest.imageUrl);
+        const blob = await response.blob();
+        const file = new File([blob], "demo-contest-banner.jpg", { type: blob.type || "image/jpeg" });
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+        imageInputRef.current.files = dataTransfer.files;
+        imageInputRef.current.dispatchEvent(new Event("change", { bubbles: true }));
+      }
+
+      Swal.fire({
+        title: "Demo data loaded",
+        text: "You can submit this as-is or tweak any field.",
+        icon: "success",
+        background: "#0a0f1c",
+        color: "#fff",
+        timer: 1600,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      Swal.fire({
+        title: "Demo load failed",
+        text: "Could not attach the sample image, but the text fields can still be filled.",
+        icon: "warning",
+        background: "#0a0f1c",
+        color: "#fff",
+      });
+      setValue("name", demoContest.name);
+      setValue("description", demoContest.description);
+      setValue("taskInstruction", demoContest.taskInstruction);
+      setValue("type", demoContest.type);
+      setValue("price", demoContest.price);
+      setValue("prize", demoContest.prize);
+      setDeadline(demoContest.deadline);
+    }
+  };
 
   const onSubmit = async (data) => {
     if (!user) {
@@ -22,16 +108,10 @@ const AddContest = () => {
     setLoading(true);
 
     try {
-      const formData = new FormData();
-      formData.append("image", data.image[0]);
+      const selectedFile = data.image?.[0];
+      if (!selectedFile) throw new Error("Image is required");
 
-      const imgRes = await axios.post(
-        `https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_imgHost}`,
-        formData
-      );
-
-      const imageUrl = imgRes.data?.data?.url;
-      if (!imageUrl) throw new Error("Image upload failed");
+      const imageUrl = await resolveContestImage(selectedFile);
 
       const contestData = {
         name: data.name,
@@ -53,7 +133,7 @@ const AddContest = () => {
 
       Swal.fire({
         title: "Success 🎉",
-        text: "Contest submitted for admin approval",
+        text: "Contest saved and submitted for admin approval",
         icon: "success",
         background: "#0a0f1c",
         color: "#fff",
@@ -89,6 +169,19 @@ const AddContest = () => {
 
         {/* Form Card */}
         <div className="bg-slate-900/40 border border-slate-800 rounded-[2rem] md:rounded-[3rem] p-6 md:p-12 backdrop-blur-xl shadow-2xl">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 md:mb-8">
+            <p className="text-slate-400 text-sm max-w-2xl">
+              Fill the form manually or use a demo contest payload to generate realistic starter data.
+            </p>
+            <button
+              type="button"
+              onClick={applyDemoData}
+              className="px-5 py-3 rounded-2xl bg-white/5 border border-slate-700 text-white font-bold text-xs uppercase tracking-[0.2em] hover:bg-primary hover:text-slate-950 transition-all"
+            >
+              Generate Demo Data
+            </button>
+          </div>
+
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 md:space-y-8">
             
             {/* Row 1: Name & Image */}
@@ -111,6 +204,7 @@ const AddContest = () => {
                 <input
                   type="file"
                   accept="image/*"
+                  ref={imageInputRef}
                   {...register("image", { required: true })}
                   className="w-full bg-slate-950/50 border border-slate-800 rounded-2xl px-4 py-2.5 text-slate-500 file:mr-4 file:py-1.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-primary/10 file:text-primary hover:file:bg-primary hover:file:text-white transition-all cursor-pointer"
                 />

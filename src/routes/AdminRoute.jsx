@@ -2,14 +2,18 @@ import { Navigate } from "react-router";
 import useAuth from "../hooks/useAuth";
 import { useEffect, useState } from "react";
 import axiosPublic from "../api/axiosPublic";
+import { getRoleFromAccessToken } from "../utils/sessionRole";
 
 const AdminRoute = ({ children }) => {
   const { user, loading } = useAuth();
-  const [role, setRole] = useState(null);
-  const [roleLoading, setRoleLoading] = useState(true);
+  const [role, setRole] = useState(() => getRoleFromAccessToken() || null);
+  const [roleLoading, setRoleLoading] = useState(false);
 
   useEffect(() => {
-    if (!user?.email) return;
+    if (!user?.email) {
+      setRoleLoading(false);
+      return;
+    }
 
     axiosPublic
       .get("/users/me")

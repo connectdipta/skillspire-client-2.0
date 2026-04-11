@@ -4,6 +4,20 @@ import { Link } from "react-router";
 import { motion } from "framer-motion";
 import { FiCalendar, FiUsers, FiAward, FiArrowRight } from "react-icons/fi";
 
+const normalizeId = (value) => {
+  if (!value) return null;
+  if (typeof value === "string") return value;
+  if (typeof value === "object") {
+    if (value.$oid) return value.$oid;
+    if (typeof value.toHexString === "function") return value.toHexString();
+    if (typeof value.toString === "function") {
+      const parsed = value.toString();
+      if (parsed && parsed !== "[object Object]") return parsed;
+    }
+  }
+  return null;
+};
+
 const ParticipatedContests = () => {
   const [contests, setContests] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -12,7 +26,9 @@ const ParticipatedContests = () => {
     const load = async () => {
       try {
         const meRes = await axiosPublic.get("/users/me");
-        const ids = meRes.data.participatedContests || [];
+        const ids = (meRes.data?.participatedContests || [])
+          .map(normalizeId)
+          .filter(Boolean);
 
         if (!ids.length) {
           setContests([]);
